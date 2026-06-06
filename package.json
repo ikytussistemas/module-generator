@@ -1,0 +1,118 @@
+{
+  "name": "module-generator",
+  "displayName": "module-generator",
+  "description": "\"Gera componentes, services e interfaces a partir de templates.\"",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.120.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "module-generator.generateCRUD",
+        "title": "Gerar Componentes (Interface, Service, Pages)"
+      }
+    ],
+    "configuration": {
+      "title": "Gerador de Módulos",
+      "properties": {
+        "gerador-de-modulos.customTemplatesPath": {
+          "type": "string",
+          "default": ".vscode/templates",
+          "description": "Caminho (relativo à raiz do projeto) contendo seus templates customizados."
+        },
+        "gerador-de-modulos.projects": {
+          "type": "array",
+          "description": "Lista de projetos/stacks configurados.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "projectName": { "type": "string" },
+              "customVariables": {
+                "type": "object",
+                "description": "Variáveis extras para serem substituídas nos templates. Ex: { \"MODULO\": \"faturamento\" }",
+                "additionalProperties": { "type": "string" }
+              },
+              "fileDefinitions": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "string" },
+                    "strategy": { 
+                      "type": "string", 
+                      "enum": ["create", "inject"],
+                      "default": "create",
+                      "description": "Define se o arquivo será criado do zero ou se receberá uma injeção de código."
+                    },
+                    "templateName": { "type": "string" },
+                    "outputFolder": { "type": "string" },
+                    "outputFileName": { "type": "string" },
+                    "customVariables": {
+                      "type": "object",
+                      "additionalProperties": { "type": "string" }
+                    },
+                    "injection": {
+                      "type": "object",
+                      "description": "Configurações necessárias caso a estratégia seja 'inject'.",
+                      "properties": {
+                        "anchor": { 
+                          "type": "string", 
+                          "description": "O texto exato/comentário que serve de alvo para a injeção. Ex: '//adicionar novas rotas aqui'" 
+                        },
+                        "position": { 
+                          "type": "string", 
+                          "enum": ["before", "after"],
+                          "default": "before",
+                          "description": "Colocar o novo código antes ou depois da linha da âncora."
+                        }
+                      },
+                      "required": ["anchor"]
+                    }
+                  },
+                  "required": ["templateName", "outputFolder", "outputFileName"]
+                }
+              }
+            },
+            "required": ["projectName", "fileDefinitions"]
+          },
+          "default": [
+            {
+              "projectName": "Padrão",
+              "fileDefinitions": [
+                {
+                  "templateName": "model.ts.template",
+                  "outputFolder": "src/app/features/{{nomeMinusculo}}",
+                  "outputFileName": "{{nomeMinusculo}}.model.ts"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/node": "^22.19.19",
+    "@types/vscode": "^1.120.0",
+    "@vscode/test-cli": "^0.0.12",
+    "@vscode/test-electron": "^2.5.2",
+    "eslint": "^9.39.3",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.56.1"
+  }
+}
